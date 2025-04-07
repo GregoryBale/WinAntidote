@@ -81,7 +81,7 @@
 - **Интерфейс**: Написана на **Tkinter** — лёгкой и эффективной библиотеке (зачем усложнять, когда можно побеждать?).  
 - **Демо**: ![Скриншот GUI](https://raw.githubusercontent.com/GregoryBale/WinAntidote/refs/heads/main/forgithub/images/Screenshot_4.png).  
 
-**Важно**: Обязательно дождись завершения работы программы — появится надпись «Восстановление завершено» ([скриншот](https://raw.githubusercontent.com/GregoryBale/WinAntidote/refs/heads/main/forgithub/images/Screenshot_3.png)). Не прерывай процесс, дай машине возмездия закончить бой!
+**Важно**: Обязательно дождись завершения работы программы — появится надпись «Восстановление завершено» (![скриншот](https://raw.githubusercontent.com/GregoryBale/WinAntidote/refs/heads/main/forgithub/images/Screenshot_3.png)). Не прерывай процесс, дай машине возмездия закончить бой!
 
 ---
 
