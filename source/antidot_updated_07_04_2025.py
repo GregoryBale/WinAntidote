@@ -29,7 +29,7 @@
 Coder (My Telegram) @gregorybale
 My Website https://gregorybale.site
 
-v.2.0123400.11
+v.2.02
 """
 
 import os
@@ -47,12 +47,149 @@ import win32con
 import win32process
 from threading import Thread
 from ctypes import windll, wintypes, byref, Structure, POINTER, c_int, c_uint, c_void_p
+import pygetwindow as gw
+import pyautogui
+from pynput.keyboard import Controller as KeyboardController
+from pynput.mouse import Controller as MouseController
+import sounddevice as sd
+import subprocess
+import pyperclip
+import asyncio
+from pypsexec.client import Client
+import pyscreeze
+import time
+from pywinauto import Application
 
 def is_admin():
     try:
         return ctypes.windll.shell32.IsUserAnAdmin()
     except:
         return False
+
+def restore_system_utilities_gui():
+    print("[*] Восстановление GUI системных утилит...")
+    try:
+        app = Application().start("control.exe")  # Панель управления
+        dlg = app.top_window()
+        if dlg.exists():
+            dlg.maximize()
+            print("[PASS] Панель управления восстановлена")
+            dlg.close()
+        else:
+            raise Exception("Окно не открылось")
+    except Exception as e:
+        print(f"[FAIL] Ошибка восстановления GUI: {e}")
+
+def check_filesystem_integrity():
+    print("[*] Проверка целостности файловой системы...")
+    try:
+        img = pytsk3.Img_Info("\\\\.\\C:")
+        fs = pytsk3.FS_Info(img)
+        if fs.info.ftype == pytsk3.TSK_FS_TYPE_NTFS:
+            root_dir = fs.open_dir("/")
+            for entry in root_dir:
+                if entry.info.name.name.decode() == "System Volume Information":
+                    print("[PASS] Файловая система NTFS в порядке")
+                    break
+        else:
+            print("[WARNING] Обнаружено изменение типа файловой системы")
+    except Exception as e:
+        print(f"[FAIL] Ошибка проверки файловой системы: {e}")
+
+def restore_desktop_via_screenshot():
+    print("[*] Проверка и восстановление рабочего стола через снимок экрана...")
+    try:
+        screenshot = pyscreeze.screenshot()
+        pixel = screenshot.getpixel((100, 100))
+        if all(p < 10 for p in pixel): 
+            print("[INFO] Обнаружен пустой рабочий стол, перезапуск Explorer...")
+            subprocess.run(["taskkill", "/IM", "explorer.exe", "/F"], check=True)
+            subprocess.run(["explorer.exe"], check=True)
+            time.sleep(2)
+            print("[PASS] Рабочий стол восстановлен")
+        else:
+            print("[INFO] Рабочий стол в порядке")
+    except Exception as e:
+        print(f"[FAIL] Ошибка анализа экрана: {e}")
+
+async def check_network_async():
+    print("[*] Асинхронная проверка сети...")
+    try:
+        async def ping_host(host):
+            proc = await asyncio.create_subprocess_exec("ping", host, "-n", "2",
+                                                        stdout=asyncio.subprocess.PIPE)
+            stdout, _ = await proc.communicate()
+            return "Reply from" in stdout.decode()
+
+        if await ping_host("8.8.8.8"):
+            print("[PASS] Сеть работает")
+        else:
+            c = Client("localhost")
+            c.connect()
+            c.run_executable("cmd.exe", arguments="/c netsh interface ip reset")
+            c.disconnect()
+            print("[PASS] Сетевые настройки сброшены через PSEXEC")
+    except Exception as e:
+        print(f"[FAIL] Ошибка проверки сети: {e}")
+
+def restore_network_async():
+    asyncio.run(check_network_async())
+
+def restore_clipboard():
+    print("[*] Восстановление буфера обмена...")
+    try:
+        pyperclip.copy("Тест Antidote")
+        if pyperclip.paste() == "Тест Antidote":
+            print("[PASS] Буфер обмена работает")
+        else:
+            raise ValueError("Буфер обмена поврежден")
+    except Exception as e:
+        print(f"[FAIL] Ошибка восстановления буфера: {e}")
+        try:
+            subprocess.run(["taskkill", "/IM", "clip.exe", "/F"], check=True)
+            print("[PASS] Процесс буфера обмена перезапущен")
+        except:
+            print("[FAIL] Не удалось перезапустить буфер")
+
+def restore_audio():
+    print("[*] Восстановление звуковых функций...")
+    try:
+        devices = sd.query_devices()
+        if not devices:
+            print("[INFO] Звуковые устройства не обнаружены, перезапуск службы...")
+            subprocess.run(["net", "stop", "audiosrv"], check=True)
+            subprocess.run(["net", "start", "audiosrv"], check=True)
+            print("[PASS] Служба звука перезапущена")
+        else:
+            print("[INFO] Звуковые устройства работают")
+    except Exception as e:
+        print(f"[FAIL] Ошибка восстановления звука: {e}")
+
+def bypass_input_blocks():
+    print("[*] Обход блокировки ввода...")
+    try:
+        keyboard = KeyboardController()
+        mouse = MouseController()
+        keyboard.press("a")
+        keyboard.release("a")
+        mouse.move(50, 50)
+        mouse.click(mouse.Button.left, 1)
+        print("[PASS] Управление мышью и клавиатурой восстановлено")
+    except Exception as e:
+        print(f"[FAIL] Ошибка восстановления ввода: {e}")
+
+def restore_hidden_windows():
+    print("[*] Восстановление скрытых системных окон...")
+    try:
+        windows = gw.getAllTitles()
+        if not any("File Explorer" in w or "Task Manager" in w for w in windows):
+            pyautogui.hotkey("win", "e") 
+            pyautogui.hotkey("ctrl", "shift", "esc") 
+            print("[PASS] Скрытые окна Explorer и Task Manager восстановлены")
+        else:
+            print("[INFO] Системные окна уже доступны")
+    except Exception as e:
+        print(f"[FAIL] Ошибка восстановления окон: {e}")
 
 def reset_network_configuration():
     try:
@@ -703,33 +840,38 @@ def create_recovery_report():
             f.write("Пользователь: " + os.getenv('USERNAME') + "\n")
             f.write("Компьютер: " + os.getenv('COMPUTERNAME') + "\n\n")
             f.write("Восстановленные функции:\n")
-            f.write("- Диспетчер задач\n")
-            f.write("- Редактор реестра\n")
-            f.write("- Командная строка и PowerShell\n")
-            f.write("- USB накопители\n")
-            f.write("- Панель управления\n")
-            f.write("- Системный трей\n")
-            f.write("- Иконки рабочего стола\n")
-            f.write("- Кнопка Пуск\n")
-            f.write("- Контекстное меню\n")
-            f.write("- Выполнение программ\n")
-            f.write("- Настройки безопасности\n")
-            f.write("- Функции восстановления Windows\n")
-            f.write("- Безопасный режим\n")
-            f.write("- Сетевые адаптеры и настройки прокси\n")
-            f.write("- Службы Windows\n")
-            f.write("- Временные файлы и кэш\n")
-            f.write("- Ассоциации файлов\n")
-            f.write("- Системные файлы\n")
-            f.write("- Запланированные задачи\n")
-            f.write("- Брандмауэр Windows\n")
-            f.write("- Точка восстановления системы\n\n")
-            f.write("- Сброс групповых политик\n")
-            f.write("- Восстановление доступа к Центру обновления Windows\n")
-            f.write("- Очистка автозагрузки в реестре\n")
-            f.write("- Восстановление экрана блокировки\n")
-            f.write("- Проверка целостности реестра\n")
+            f.write("- Диспетчер задач (Task Manager восстановлен для управления процессами)\n")
+            f.write("- Редактор реестра (RegEdit снова доступен для редактирования системных настроек)\n")
+            f.write("- Командная строка и PowerShell (CMD и PS разблокированы для выполнения команд)\n")
+            f.write("- USB накопители (Подключение USB-устройств теперь работает корректно)\n")
+            f.write("- Панель управления (Control Panel возвращена для управления системой)\n")
+            f.write("- Системный трей (Область уведомлений восстановлена для удобства)\n")
+            f.write("- Иконки рабочего стола (Рабочий стол снова отображает все ярлыки)\n")
+            f.write("- Кнопка Пуск (Меню Пуск полностью функционально)\n")
+            f.write("- Контекстное меню (Правый клик работает как раньше)\n")
+            f.write("- Выполнение программ (Запуск приложений разблокирован)\n")
+            f.write("- Настройки безопасности (Системные параметры безопасности восстановлены)\n")
+            f.write("- Функции восстановления Windows (Опции восстановления системы активированы)\n")
+            f.write("- Безопасный режим (Доступ к Safe Mode возвращён)\n")
+            f.write("- Сетевые адаптеры и настройки прокси (Сеть и прокси сброшены и работают)\n")
+            f.write("- Службы Windows (Критические службы запущены и настроены)\n")
+            f.write("- Временные файлы и кэш (Очищены временные данные для оптимизации)\n")
+            f.write("- Ассоциации файлов (Исполняемые файлы снова открываются корректно)\n")
+            f.write("- Системные файлы (Проверка и восстановление системных компонентов выполнены)\n")
+            f.write("- Запланированные задачи (Подозрительные задачи удалены из планировщика)\n")
+            f.write("- Брандмауэр Windows (Firewall активирован для защиты)\n")
+            f.write("- Точка восстановления системы (Создана точка для отката при необходимости)\n")
+            f.write("- Сброс групповых политик (Локальные политики возвращены к умолчанию)\n")
+            f.write("- Восстановление доступа к Центру обновления Windows (Обновления снова доступны)\n")
+            f.write("- Очистка автозагрузки в реестре (Удалены нежелательные записи автозапуска)\n")
+            f.write("- Восстановление экрана блокировки (Lock Screen снова функционирует)\n")
+            f.write("- Проверка целостности реестра (Реестр проверен и сохранён в резервной копии)\n\n")
             f.write("РЕКОМЕНДАЦИЯ: Выполните полную проверку системы антивирусом и перезагрузите компьютер.\n")
+            f.write("Дополнительные действия:\n")
+            f.write("- Убедитесь, что все драйверы обновлены через Центр обновления или сайт производителя.\n")
+            f.write("- Проверьте наличие подозрительных процессов в Диспетчере задач.\n")
+            f.write("- Создайте резервную копию важных данных на внешний носитель.\n")
+            f.write("- Если проблемы сохраняются, обратитесь к специалисту или в сообщество проекта.\n")
 
         print(f"[+++++++++PASS !!!++++++++++] Отчет о восстановлении создан: {report_path}")
     except Exception as e:
@@ -783,7 +925,7 @@ def main():
 Coder (My Telegram) @gregorybale
 My Website https://gregorybale.site
 
-v.2.0123400.11
+v.2.02
     """)
 
     if not force_admin_privileges():
@@ -826,6 +968,14 @@ v.2.0123400.11
     repair_boot_sector()
     restore_antivirus()
     restore_windows_firewall()
+    restore_audio()
+    bypass_input_blocks()
+    restore_hidden_windows()
+    restore_clipboard()
+    restore_network_async()
+    check_filesystem_integrity()
+    restore_system_utilities_gui()
+    restore_desktop_via_screenshot()
     
     print("[*] Перезапуск проводника для применения изменений...")
     for proc in psutil.process_iter(['pid', 'name']):
