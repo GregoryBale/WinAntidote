@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GregoryBale Antidote</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            overflow-y: auto !important;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(-50px);
+            }
+            100% {
+                transform: translateY(-100px) translateX(50px);
+            }
+        }
+        
+        /* Основные стили для темного режима */
+        .dark-mode {
+            background-color: #1a202c;
+            color: #fff;
+        }
+        
+        .dark-mode .bg-section {
+            background-color: #1a202c;
+        }
+        
+        .dark-mode .bg-section-alt {
+            background-color: #2d3748;
+        }
+        
+        .dark-mode .header-bg {
+            background-color: #2d3748;
+        }
+        
+        .dark-mode .text-dark {
+            color: #fff;
+        }
+        
+        .dark-mode .text-secondary {
+            color: #a0aec0;
+        }
+        
+        .dark-mode .card-bg {
+            background-color: #2d3748;
+        }
+        
+        .dark-mode .header-link {
+            color: #a0aec0;
+        }
+        
+        .dark-mode .header-link:hover {
+            color: #63b3ed;
+        }
+        
+        /* Основные стили для светлого режима */
+        .light-mode {
+            background-color: #f7fafc;
+            color: #1a202c;
+        }
+        
+        .light-mode .bg-section {
+            background-color: #fff;
+        }
+        
+        .light-mode .bg-section-alt {
+            background-color: #f7fafc;
+        }
+        
+        .light-mode .header-bg {
+            background-color: #fff;
+        }
+        
+        .light-mode .text-dark {
+            color: #1a202c;
+        }
+        
+        .light-mode .text-secondary {
+            color: #4a5568;
+        }
+        
+        .light-mode .card-bg {
+            background-color: #f7fafc;
+        }
+        
+        .light-mode .header-link {
+            color: #4a5568;
+        }
+        
+        .light-mode .header-link:hover {
+            color: #3182ce;
+        }
+        
+        /* Стили для плавающего кода */
+        .floating-code {
+            position: absolute;
+            color: #e2e8f0;
+            opacity: 0.05;
+            white-space: nowrap;
+            font-size: 0.875rem;
+            pointer-events: none;
+        }
+        
+        /* Фикс для прокрутки на мобильных устройствах */
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+        
+        /* Исправление для табов */
+        .tab-transition {
+            transition: all 0.3s ease;
+        }
+        
+        /* Фикс для активных ссылок в навигации */
+        .nav-link.active {
+            color: #3182ce;
+        }
+        
+        /* Исправление для секции с градиентом */
+        .gradient-section {
+            background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+        }
+    </style>
+</head>
+<body class="light-mode font-sans">
+    <!-- Фон с плавающим кодом (переработан для лучшей производительности) -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none" id="codeBackground"></div>
+    
+    <!-- Хедер (фиксированный) -->
+    <header class="sticky top-0 z-50 header-bg bg-opacity-90 backdrop-blur-md shadow-sm transition-colors duration-300" id="header">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-shield-alt text-blue-600 text-2xl"></i>
+                <span class="text-xl font-bold text-dark">Anti<span class="text-blue-600">Dote</span></span>
+            </div>
+            
+            <!-- Десктопная навигация -->
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#features" class="header-link hover:text-blue-600 transition-colors">Функции</a>
+                <a href="#how-it-works" class="header-link hover:text-blue-600 transition-colors">Как это работает</a>
+                <a href="#benefits" class="header-link hover:text-blue-600 transition-colors">Преимущества</a>
+                <a href="#usage-guide" class="header-link hover:text-blue-600 transition-colors">Инструкция</a>
+                <a href="#faq" class="header-link hover:text-blue-600 transition-colors">FAQ</a>
+                <a href="#download" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">Скачать сейчас</a>
+                <button id="darkModeToggle" class="text-blue-600 hover:text-blue-700 transition-colors">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </nav>
+            
+            <!-- Мобильная навигация (кнопки) -->
+            <div class="md:hidden flex items-center space-x-4">
+                <button id="mobileDarkModeToggle" class="text-blue-600 hover:text-blue-700 transition-colors">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="mobileMenuToggle" class="text-dark focus:outline-none">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Мобильное меню (скрыто по умолчанию) -->
+        <div id="mobileMenu" class="md:hidden header-bg shadow-lg hidden transition-all duration-300 ease-in-out">
+            <nav class="flex flex-col space-y-4 p-4">
+                <a href="#features" class="header-link hover:text-blue-600 transition-colors mobile-nav-link">Функции</a>
+                <a href="#how-it-works" class="header-link hover:text-blue-600 transition-colors mobile-nav-link">Как это работает</a>
+                <a href="#benefits" class="header-link hover:text-blue-600 transition-colors mobile-nav-link">Преимущества</a>
+                <a href="#usage-guide" class="header-link hover:text-blue-600 transition-colors mobile-nav-link">Инструкция</a>
+                <a href="#faq" class="header-link hover:text-blue-600 transition-colors mobile-nav-link">FAQ</a>
+                <a href="#download" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-center mobile-nav-link">Скачать сейчас</a>
+            </nav>
+        </div>
+    </header>
+    
+    <!-- Главная секция -->
+    <section id="hero" class="py-20 overflow-hidden bg-gradient-to-br from-blue-50 to-gray-100 transition-colors duration-300">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 mb-10 md:mb-0">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4 text-dark">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-700">
+                        Освободите вашу Windows
+                    </span>
+                </h1>
+                <p class="text-xl text-secondary mb-8">
+                    Продвинутая утилита восстановления системы, разработанная для отмены ограничений вредоносного ПО и возвращения Windows к нормальной функциональности.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#download" class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors flex items-center">
+                        <i class="fas fa-bolt mr-2"></i> Скачать
+                    </a>
+                    <a href="#features" class="bg-white text-blue-600 border border-blue-600 px-6 py-3 rounded-md hover:bg-blue-50 transition-colors flex items-center">
+                        <i class="fas fa-terminal mr-2"></i> Узнать больше
+                    </a>
+                </div>
+            </div>
+            <div class="md:w-1/2 relative">
+                <div class="relative mx-auto w-full max-w-md">
+                    <div class="absolute inset-0 bg-blue-600 rounded-lg transform rotate-3 scale-105 opacity-10"></div>
+                    <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+                        <div class="bg-gray-800 text-white p-2 flex items-center">
+                            <div class="flex space-x-1.5">
+                                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            </div>
+                            <div class="mx-auto text-sm font-mono">WinAntidote (UI) v.2.0.2b</div>
+                        </div>
+                        <div class="bg-gray-900 p-4 font-mono text-sm text-green-400 h-64 overflow-hidden">
+                            <p class="mt-2">[PROCESSING !] Запуск скрипта восстановления...</p>
+                            <p>[+] Восстановление диспетчера задач</p>
+                            <p>[+] Восстановление редактора реестра</p>
+                            <p>[+] Восстановление командной строки</p>
+                            <p>[+] Восстановление USB-накопителей</p>
+                            <p>[+] Восстановление панели управления</p>
+                            <p class="text-yellow-400">[PROCESSING !] Перезапуск проводника...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Секция функций -->
+    <section id="features" class="py-20 bg-section transition-colors duration-300">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-dark mb-4">Мощные функции восстановления</h2>
+            <p class="text-secondary text-center max-w-2xl mx-auto mb-12">
+                Наша утилита-антидот содержит всё необходимое для восстановления вашей системы Windows до полной функциональности после атаки вредоносного ПО.
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Карточка функции 1 -->
+                <div class="card-bg rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="mb-4"><i class="fas fa-shield-alt text-blue-600 text-3xl"></i></div>
+                    <h3 class="text-xl font-semibold text-dark mb-2">Защита системы</h3>
+                    <p class="text-secondary">Восстанавливает Windows Defender, настройки брандмауэра и другие функции безопасности, отключенные вредоносным ПО.</p>
+                </div>
+                
+                <!-- Карточка функции 2 -->
+                <div class="card-bg rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="mb-4"><i class="fas fa-terminal text-blue-600 text-3xl"></i></div>
+                    <h3 class="text-xl font-semibold text-dark mb-2">Восстановление инструментов</h3>
+                    <p class="text-secondary">Повторно включает Диспетчер задач, Редактор реестра, Командную строку и другие системные инструменты.</p>
+                </div>
+                
+                <!-- Карточка функции 3 -->
+                <div class="card-bg rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="mb-4"><i class="fas fa-sync-alt text-blue-600 text-3xl"></i></div>
+                    <h3 class="text-xl font-semibold text-dark mb-2">Сброс сети</h3>
+                    <p class="text-secondary">Сбрасывает конфигурацию сети, очищает кэш DNS и восстанавливает нормальное подключение к интернету.</p>
+                </div>
+                
+                <!-- Карточка функции 4 -->
+                <div class="card-bg rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="mb-4"><i class="fas fa-code text-blue-600 text-3xl"></i></div>
+                    <h3 class="text-xl font-semibold text-dark mb-2">Восстановление реестра</h3>
+                    <p class="text-secondary">Исправляет изменения реестра, сделанные вредоносным ПО для блокировки системных функций и функций безопасности.</p>
+                </div>
+                
+                <!-- Карточка функции 5 -->
+                <div class="card-bg rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="mb-4"><i class="fas fa-award text-blue-600 text-3xl"></i></div>
+                    <h3 class="text-xl font-semibold text-dark mb-2">Восстановление загрузочного сектора</h3>
+                    <p class="text-secondary">Восстанавливает поврежденные загрузочные секторы для обеспечения нормального запуска системы после удаления вредоносного ПО.</p>
+                </div>
+                
+                <!-- Карточка функции 6 -->
+                <div class="card-bg rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="mb-4"><i class="fas fa-bolt text-blue-600 text-3xl"></i></div>
+                    <h3 class="text-xl font-semibold text-dark mb-2">Расширенное восстановление</h3>
+                    <p class="text-secondary">Восстанавливает доступ к панели управления, ассоциациям файлов и удаляет автозагрузку вредоносного ПО.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Секция "Как это работает" -->
+    <section id="how-it-works" class="py-20 bg-section-alt transition-colors duration-300">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-dark mb-4">Как это работает</h2>
+            <p class="text-secondary text-center max-w-2xl mx-auto mb-12">
+                Наш антидот работает путем систематического устранения ограничений и повреждений, вызванных вредоносным ПО, восстанавливая нормальную функциональность вашей системы.
+            </p>
+            
+            <div class="max-w-3xl mx-auto">
+                <!-- Шаг 1 -->
+                <div class="flex mb-8">
+                    <div class="mr-4 pt-1">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white font-bold">
+                            1
+                        </div>
+                        <div class="h-full w-0.5 bg-blue-200 mx-auto my-2"></div>
+                    </div>
+                    <div class="bg-section rounded-lg p-6 shadow-sm flex-1">
+                        <h3 class="text-xl font-semibold text-dark mb-2">Запуск с правами администратора</h3>
+                        <p class="text-secondary">Запустите антидот-скрипт с правами администратора, чтобы разрешить изменения на системном уровне.</p>
+                    </div>
+                </div>
+                
+                <!-- Шаг 2 -->
+                <div class="flex mb-8">
+                    <div class="mr-4 pt-1">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white font-bold">
+                            2
+                        </div>
+                        <div class="h-full w-0.5 bg-blue-200 mx-auto my-2"></div>
+                    </div>
+                    <div class="bg-section rounded-lg p-6 shadow-sm flex-1">
+                        <h3 class="text-xl font-semibold text-dark mb-2">Автоматическое обнаружение</h3>
+                        <p class="text-secondary">Утилита автоматически обнаруживает системные ограничения и отключенные функции.</p>
+                    </div>
+                </div>
+                
+                <!-- Шаг 3 -->
+                <div class="flex mb-8">
+                    <div class="mr-4 pt-1">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white font-bold">
+                            3
+                        </div>
+                        <div class="h-full w-0.5 bg-blue-200 mx-auto my-2"></div>
+                    </div>
+                    <div class="bg-section rounded-lg p-6 shadow-sm flex-1">
+                        <h3 class="text-xl font-semibold text-dark mb-2">Восстановление системы</h3>
+                        <p class="text-secondary">Методично восстанавливает доступ к системным инструментам, функциям безопасности и сетевым функциям.</p>
+                    </div>
+                </div>
+                
+                <!-- Шаг 4 -->
+                <div class="flex mb-8">
+                    <div class="mr-4 pt-1">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white font-bold">
+                            4
+                        </div>
+                        <div class="h-full w-0.5 bg-blue-200 mx-auto my-2"></div>
+                    </div>
+                    <div class="bg-section rounded-lg p-6 shadow-sm flex-1">
+                        <h3 class="text-xl font-semibold text-dark mb-2">Блокировка вредоносного ПО</h3>
+                        <p class="text-secondary">Удаляет записи автозагрузки и завершает процессы, блокирующие функциональность системы.</p>
+                    </div>
+                </div>
+                
+                <!-- Шаг 5 -->
+                <div class="flex">
+                    <div class="mr-4 pt-1">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white font-bold">
+                            5
+                        </div>
+                    </div>
+                    <div class="bg-section rounded-lg p-6 shadow-sm flex-1">
+                        <h3 class="text-xl font-semibold text-dark mb-2">Подробный отчет</h3>
+                        <p class="text-secondary">Создает детальный отчет о всех предпринятых действиях и рекомендует следующие шаги.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Секция преимуществ -->
+    <section id="benefits" class="py-20 bg-section transition-colors duration-300">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-dark mb-4">Почему стоит выбрать наш антидот</h2>
+            <p class="text-secondary text-center max-w-2xl mx-auto mb-12">
+                Когда вредоносное ПО блокирует доступ к вашей системе, вам нужно надежное решение, чтобы вернуть контроль.
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-blue-50 rounded-lg p-8 dark:bg-blue-900 dark:bg-opacity-20">
+                    <h3 class="text-xl font-semibold text-dark mb-4">Ключевые преимущества</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                            <span class="text-secondary">Не требует установки - запускается прямо из EXE</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                            <span class="text-secondary">Работает даже когда большинство системных инструментов отключены</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                            <span class="text-secondary">Восстанавливает полную функциональность системы за считанные минуты</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                            <span class="text-secondary">Создает резервные копии для обеспечения успешного восстановления</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                            <span class="text-secondary">Детальное логирование всех действий восстановления</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                            <span class="text-secondary">Совместимость со всеми версиями Windows</span>
+                        </li>
+                    </ul>
+                </div>    
+                <div class="card-bg rounded-lg p-8">
+                    <h3 class="text-xl font-semibold text-dark mb-4">Отзывы пользователей (пока мечта)</h3>
+                    <div class="space-y-6">
+                        <div class="bg-section p-4 rounded shadow-sm">
+                            <p class="text-secondary italic mb-2">"Это спасло меня, когда программа-вымогатель заблокировала мой компьютер. Диспетчер задач, Редактор реестра - все было отключено. Этот скрипт исправил всё за считанные минуты!"</p>
+                            <p class="text-dark font-medium">— Михаил К.</p>
+                        </div>
+                        <div class="bg-section p-4 rounded shadow-sm">
+                            <p class="text-secondary italic mb-2">"Как IT-специалист, я всегда держу этот инструмент под рукой. Он сэкономил бесчисленные часы ручного редактирования реестра и восстановления системы."</p>
+                            <p class="text-dark font-medium">— Сара Т., IT-специалист</p>
+                        </div>
+                        <div class="bg-section p-4 rounded shadow-sm">
+                            <p class="text-secondary italic mb-2">"Когда ничего другого не работало, эта утилита восстановила мой доступ к инструментам безопасности Windows. Теперь я наконец смог удалить вредоносное ПО!"</p>
+                            <p class="text-dark font-medium">— Давид Р.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Секция инструкций по использованию -->
+    <section id="usage-guide" class="py-20 bg-section transition-colors duration-300">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-dark mb-4">Как использовать антидот</h2>
+            <p class="text-secondary text-center max-w-2xl mx-auto mb-12">
+                Следуйте этим пошаговым инструкциям для восстановления вашей системы после атаки вредоносного ПО
+            </p>
+
+            <div class="max-w-4xl mx-auto">
+                <div class="card-bg rounded-lg overflow-hidden shadow-lg">
+                    <div class="p-6">
+                        <div class="flex border-b mb-6" id="tabsContainer">
+                            <button class="px-4 py-2 font-medium text-blue-600 border-b-2 border-blue-600 tab-button" data-tab="description">
+                                <i class="fas fa-file-alt mr-2"></i>
+                                Обычное использование
+                            </button>
+                            <button class="px-4 py-2 font-medium text-secondary tab-button" data-tab="advanced">
+                                <i class="fas fa-terminal mr-2"></i>
+                                Продвинутое использование
+                            </button>
+                            <button class="px-4 py-2 font-medium text-secondary tab-button" data-tab="emergency">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                Экстренное восстановление
+                            </button>
+                        </div>
+                        <div id="tab-content-container">
+                            <!-- Таб 1: Обычное использование -->
+                            <div id="tab-description" class="tab-content">
+                                <div class="mb-8 text-secondary">
+                                    <h3 class="text-xl font-semibold text-dark mb-3">Стандартный процесс восстановления</h3>
+                                    <ol class="space-y-4 pl-5">
+                                        <li class="list-decimal">
+                                            <strong class="text-dark">Скачайте ANTIDOTE.exe или ANTIDOTE_UI.exe из Гитхаба</strong> - Сохраните программу на рабочий стол или в любое доступное место
+                                        </li>
+                                        <li class="list-decimal">
+                                            <strong class="text-dark">Запустите от имени администратора</strong> - Щелкните правой кнопкой мыши по скрипту и выберите "Запуск от имени администратора" (программа автоматически запросит права администратора)
+                                        </li>
+                                        <li class="list-decimal">
+                                            <strong class="text-dark">Дождитесь выполнения модулей восстановления</strong>
+                                        </li>
+                                        <li class="list-decimal">
+                                            <strong class="text-dark">Проверьте результаты</strong> - Отчет о восстановлении будет сохранен на рабочем столе (recovery_report.txt)
+                                        </li>
+                                        <li class="list-decimal">
+                                            <strong class="text-dark">Перезагрузите компьютер</strong> - Для полного применения всех изменений (некоторые функции требуют перезагрузки)
+                                        </li>
+                                    </ol>
+                                </div>
+                                
+                                <div class="flex items-start p-4 rounded-lg bg-blue-50 dark:bg-blue-900 dark:bg-opacity-20">
+                                    <div class="mr-3 mt-1">
+                                        <i class="fas fa-question-circle text-blue-500"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-blue-700 dark:text-blue-300 mb-1">Совет</h4>
+                                        <p class="text-secondary text-sm">
+                                            Программа автоматически создаст свои резервные копии в нескольких местах (Рабочий стол, Документы, временная папка). Рекомендуется также сохранить копию на USB-накопителе, если ваша система сильно ограничена. Для более удобного интерфейса используйте версию ANTIDOT_UI.exe.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Таб 2: Расширенное использование -->
+                            <div id="tab-advanced" class="tab-content hidden">
+                                <div class="mb-8 text-secondary">
+                                    <h3 class="text-xl font-semibold text-dark mb-3">Расширенные функции WinAntidote</h3>
+                                    
+                                    <div class="space-y-6">
+                                        <div>
+                                            <h4 class="font-medium text-dark mb-2">Версии скрипта</h4>
+                                            <p class="mb-2">WinAntidote доступен в двух версиях:</p>
+                                            <ul class="list-disc ml-6 space-y-2">
+                                                <li><strong>ANTIDOT</strong> - Консольная версия для работы в терминале</li>
+                                                <li><strong>ANTIDOT_UI</strong> - Версия с графическим интерфейсом для удобного использования</li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div>
+                                            <h4 class="font-medium text-dark mb-2">Модули восстановления</h4>
+                                            <p>WinAntidote включает следующие ключевые модули восстановления:</p>
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                                                <div>
+                                                    <h5 class="font-medium text-dark">Системные инструменты</h5>
+                                                    <ul class="list-disc ml-6">
+                                                        <li>Восстановление Диспетчера задач</li>
+                                                        <li>Восстановление Редактора реестра</li>
+                                                        <li>Восстановление CMD и PowerShell</li>
+                                                        <li>Восстановление Панели управления</li>
+                                                    </ul>
+                                                </div>
+                                                <div>
+                                                    <h5 class="font-medium text-dark">Сеть и безопасность</h5>
+                                                    <ul class="list-disc ml-6">
+                                                        <li>Сброс сетевой конфигурации</li>
+                                                        <li>Восстановление антивируса</li>
+                                                        <li>Восстановление брандмауэра</li>
+                                                        <li>Сброс настроек прокси</li>
+                                                    </ul>
+                                                </div>
+                                                <div>
+                                                    <h5 class="font-medium text-dark">Интерфейс Windows</h5>
+                                                    <ul class="list-disc ml-6">
+                                                        <li>Восстановление рабочего стола</li>
+                                                        <li>Восстановление системного трея</li>
+                                                        <li>Восстановление кнопки Пуск</li>
+                                                        <li>Восстановление контекстного меню</li>
+                                                    </ul>
+                                                </div>
+                                                <div>
+                                                    <h5 class="font-medium text-dark">Служебные функции</h5>
+                                                    <ul class="list-disc ml-6">
+                                                        <li>Очистка временных файлов</li>
+                                                        <li>Восстановление загрузочного сектора</li>
+                                                        <li>Сброс групповых политик</li>
+                                                        <li>Создание отчета о восстановлении</li>
+                                                        <li>и другие!</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <h4 class="font-medium text-dark mb-2">Автоматическое получение прав администратора</h4>
+                                            <p>Программа имеет несколько методов для получения прав администратора:</p>
+                                            <ol class="list-decimal ml-6 mt-2 space-y-1">
+                                                <li>Стандартный метод через ShellExecuteW</li>
+                                                <li>Альтернативный метод через PowerShell (если стандартный метод не сработал)</li>
+                                                <li>Работа с ограниченными функциями (если права не получены)</li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Таб 3: Экстренное восстановление -->
+                            <div id="tab-emergency" class="tab-content hidden">
+                                <div class="mb-8 text-secondary">
+                                    <h3 class="text-xl font-semibold text-dark mb-3">Методы экстренного восстановления</h3>
+                                    
+                                    <div class="p-4 mb-6 rounded-lg border border-red-200 bg-red-50 dark:border-red-500 dark:bg-red-900 dark:bg-opacity-20">
+                                        <div class="flex items-start">
+                                            <i class="fas fa-exclamation-triangle text-red-500 dark:text-red-400 mr-2 mt-0.5"></i>
+                                            <p class="text-red-700 dark:text-red-300 text-sm">
+                                                Эти методы предназначены для экстренных ситуаций, когда система значительно ограничена вредоносным ПО или блокировщиками. Используйте их, если обычный метод запуска недоступен.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="space-y-6">
+                                        <div>
+                                            <h4 class="font-medium text-dark mb-2">Использование в безопасном режиме</h4>
+                                            <ol class="space-y-2 pl-5">
+                                                <li class="list-decimal">Перезагрузите компьютер в безопасном режиме (F8 при загрузке)</li>
+                                                <li class="list-decimal">В безопасном режиме многие блокировки могут не работать</li>
+                                                <li class="list-decimal">Запустите программу ANTIDOT.exe или ANTIDOT_UI.exe от имени администратора</li>
+                                                <li class="list-decimal">Дождитесь завершения процесса восстановления</li>
+                                                <li class="list-decimal">Перезагрузите компьютер в обычном режиме</li>
+                                            </ol>
+                                        </div>
+                                        
+                                        <div>
+                                            <h4 class="font-medium text-dark mb-2">Борьба с блокирующими скриптами</h4>
+                                            <p>WinAntidote имеет функцию kill_blocking_scripts, которая:</p>
+                                            <ul class="list-disc pl-5 mt-2">
+                                                <li>Обнаруживает и завершает процессы блокировки по ключевым словам</li>
+                                                <li>Удаляет файлы-флаги блокировки из разных мест системы</li>
+                                                <li>Находит и удаляет скрытые копии скриптов блокировки в системных папках</li>
+                                                <li>Автоматически создает резервные копии самого себя в разных местах</li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div>
+                                            <h4 class="font-medium text-dark mb-2">Метод запуска с USB-накопителя</h4>
+                                            <ol class="space-y-2 pl-5 mt-2">
+                                                <li class="list-decimal">Скопируйте ANTIDOT.exe или ANTIDOT_UI.exe на USB-накопитель</li>
+                                                <li class="list-decimal">Создайте на USB-накопителе файл run.bat со следующим содержимым:</li>
+                                                <div class="font-mono text-sm p-3 rounded bg-gray-100 dark:bg-gray-900 my-2 ml-5">
+                                                    @echo off<br/>
+                                                    cd /d %~dp0<br/>
+                                                    python ANTIDOT.exe<br/>
+                                                    pause
+                                                </div>
+                                                <li class="list-decimal">Вставьте USB-накопитель в заблокированный компьютер</li>
+                                                <li class="list-decimal">Запустите run.bat (если возможно) или используйте командную строку</li>
+                                            </ol>
+                                        </div>
+                                        
+                                        <div>
+                                            <h4 class="font-medium text-dark mb-2">Автоматическое обнаружение проблем</h4>
+                                            <p>WinAntidote имеет следующие методы обнаружения проблем:</p>
+                                            <ul class="list-disc pl-5 mt-2">
+                                                <li>restore_desktop_via_screenshot - анализирует скриншот для проверки пустого рабочего стола</li>
+                                                <li>check_filesystem_integrity - проверяет целостность файловой системы</li>
+                                                <li>restore_audio - обнаруживает и восстанавливает звуковые функции</li>
+                                                <li>bypass_input_blocks - преодолевает блокировки клавиатуры и мыши</li>
+                                                <li>restore_hidden_windows - восстанавливает скрытые системные окна</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Секция FAQ -->
+    <section id="faq" class="py-20 bg-section-alt transition-colors duration-300">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-dark mb-4">Часто задаваемые вопросы</h2>
+            <p class="text-secondary text-center max-w-2xl mx-auto mb-12">
+                Получите ответы на самые распространенные вопросы об использовании нашей утилиты-антидота
+            </p>
+            
+            <div class="max-w-3xl mx-auto grid gap-6">
+                <!-- FAQ 1 -->
+                <div class="bg-section rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-dark mb-3">Безопасно ли использовать антидот?</h3>
+                    <p class="text-secondary">Да, наш антидот разработан только для восстановления функций Windows, которые были отключены вредоносным ПО. Он не удаляет пользовательские файлы и не вносит постоянных системных изменений, кроме восстановления нормальной функциональности.</p>
+                </div>
+                
+                <!-- FAQ 2 -->
+                <div class="bg-section rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-dark mb-3">Удаляет ли это вредоносное ПО, вызвавшее проблему?</h3>
+                    <p class="text-secondary">Антидот фокусируется на восстановлении функциональности системы, а не на удалении вредоносного ПО. После восстановления работы системных инструментов вам следует запустить полное сканирование антивирусом, используя Windows Defender или другое решение безопасности.</p>
+                </div>
+                
+                <!-- FAQ 3 -->
+                <div class="bg-section rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-dark mb-3">Почему скрипт требует прав администратора?</h3>
+                    <p class="text-secondary">Права администратора необходимы для внесения изменений в системные настройки, записи реестра и службы, которые были изменены вредоносным ПО. Без этих привилегий антидот не сможет восстановить большинство системных функций.</p>
+                </div>
+                
+                <!-- FAQ 4 -->
+                <div class="bg-section rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-dark mb-3">Будет ли это работать, если мой Диспетчер задач и Редактор реестра отключены?</h3>
+                    <p class="text-secondary">Да! Антидот специально разработан для работы даже при отключении этих инструментов. Он может восстановить доступ к Диспетчеру задач, Редактору реестра, Командной строке и другим заблокированным системным инструментам.</p>
+                </div>
+                
+                <!-- FAQ 5 -->
+                <div class="bg-section rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-dark mb-3">Нужно ли перезагружать компьютер после запуска антидота?</h3>
+                    <p class="text-secondary">Хотя многие функции восстанавливаются немедленно, рекомендуется перезагрузка системы для полного применения всех изменений, особенно связанных с системными службами и функциями безопасности.</p>
+                </div>
+                
+                <!-- FAQ 6 -->
+                <div class="bg-section rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-dark mb-3">Могу ли я использовать это на Windows 7/8/10/11?</h3>
+                    <p class="text-secondary">Да, антидот совместим со всеми современными версиями Windows, включая Windows 7, 8, 10 и 11. Основные системные функции, которые он восстанавливает, существуют во всех этих версиях.</p>
+                </div>
+                
+                <!-- FAQ 7 -->
+                <div class="bg-section rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-dark mb-3">Что делать, если антидот не решает мою проблему?</h3>
+                    <p class="text-secondary">Антидот создает подробный отчет о предпринятых действиях. Если некоторые функции не восстановлены, проверьте этот отчет на наличие подсказок. Вы также можете попробовать запустить в безопасном режиме или связаться с нами для дополнительной поддержки.</p>
+                </div>
+                
+                <!-- FAQ 8 -->
+                <div class="bg-section rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-dark mb-3">Это проект с открытым исходным кодом? Могу ли я его модифицировать?</h3>
+                    <p class="text-secondary">Да, антидот имеет открытый исходный код, и вы можете модифицировать его под свои конкретные нужды. Мы поощряем пользователей вносить улучшения или адаптации для конкретных вариантов вредоносного ПО.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Секция загрузки -->
+    <section id="download" class="py-20 gradient-section text-white transition-colors duration-300">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-4">Скачать GregoryBale Antidote</h2>
+            <p class="max-w-2xl mx-auto mb-8 text-blue-100">
+                Верните вашу систему Windows в нормальное состояние с помощью нашего мощного инструмента восстановления. Бесплатный, с открытым исходным кодом и постоянно обновляемый.
+            </p>
+            
+            <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-8 max-w-2xl mx-auto">
+                <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <div class="bg-white bg-opacity-20 rounded p-4 text-left">
+                        <p class="text-sm mb-1">Последняя версия</p>
+                        <p class="font-mono font-bold">v.2.0.2b</p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded p-4 text-left">
+                        <p class="text-sm mb-1">Дата выпуска</p>
+                        <p class="font-bold">07.04.2025</p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded p-4 text-left">
+                        <p class="text-sm mb-1">Размер</p>
+                        <p class="font-bold">8.5 MB</p>
+                    </div>
+                </div>
+                
+                <div class="mt-8">
+                    <a href="https://github.com/GregoryBale/WinAntidote/releases" class="inline-block bg-white text-blue-700 hover:bg-blue-50 px-8 py-3 rounded-md font-bold transition-colors">
+                        Скачать сейчас
+                    </a>
+                    <p class="mt-4 text-sm text-blue-100">
+                        Скачивая, вы соглашаетесь использовать этот инструмент ответственно и на свой риск.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6">
+                    <h3 class="font-semibold mb-2">Связь</h3>
+                    <p class="text-sm text-blue-100 mb-4">
+                       Появились идеи или вы нашли баг?
+                    </p>
+                    <a href="https://t.me/gregorybale" class="text-white flex items-center hover:underline">
+                        <span>Написать разработчику</span>
+                        <i class="fas fa-chevron-right ml-1 text-sm"></i>
+                    </a>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6">
+                    <h3 class="font-semibold mb-2">Исходный код</h3>
+                    <p class="text-sm text-blue-100 mb-4">
+                        Просмотрите или внесите вклад в наш проект с открытым исходным кодом на GitHub.
+                    </p>
+                    <a href="https://github.com/GregoryBale/WinAntidote" class="text-white flex items-center hover:underline">
+                        <span>GitHub репозиторий</span>
+                        <i class="fas fa-chevron-right ml-1 text-sm"></i>
+                    </a>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6">
+                    <h3 class="font-semibold mb-2">Следите за обновлениями</h3>
+                    <p class="text-sm text-blue-100 mb-4">
+                        Подпишитесь на наш Telegram канал для получения последних обновлений.
+                    </p>
+                    <a href="https://t.me/gregorybaleportfolio" class="text-white flex items-center hover:underline">
+                        <span>gregorybale</span>
+                        <i class="fas fa-chevron-right ml-1 text-sm"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Футер -->
+    <footer class="bg-gray-900 text-gray-200 py-12 transition-colors duration-300">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i class="fas fa-shield-alt text-blue-400"></i>
+                        <span class="text-lg font-bold text-white">Anti<span class="text-blue-400">Dote</span></span>
+                    </div>
+                    <p class="text-gray-400 text-sm">
+                        Окончательный инструмент восстановления для систем Windows, скомпрометированных ограничениями вредоносного ПО.
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-semibold mb-4">Быстрые ссылки</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#features" class="text-gray-400 hover:text-white transition-colors">Функции</a></li>
+                        <li><a href="#how-it-works" class="text-gray-400 hover:text-white transition-colors">Как это работает</a></li>
+                        <li><a href="#benefits" class="text-gray-400 hover:text-white transition-colors">Преимущества</a></li>
+                        <li><a href="#download" class="text-gray-400 hover:text-white transition-colors">Скачать</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-semibold mb-4">Ресурсы</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Документация</a></li>
+                        <li><a href="#faq" class="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-semibold mb-4">Контакты</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <span class="text-gray-400">Telegram:</span>
+                            <a href="https://t.me/gregorybale" class="text-blue-400 ml-2 hover:text-blue-300 transition-colors">@gregorybale</a>
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-gray-400">Сайт:</span>
+                            <a href="https://gregorybale.site" class="text-blue-400 ml-2 hover:text-blue-300 transition-colors">gregorybale.site</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400 text-sm">
+                <p>© 2025 Antidote. Все права защищены.</p>
+                <p class="mt-2">Этот инструмент предоставляется "как есть" без каких-либо гарантий. Используйте на свой страх и риск.</p>
+                <div class="flex justify-center items-center mt-4 space-x-3">
+                    <a href="https://github.com/GregoryBales" class="hover:text-white transition-colors">
+                        <i class="fab fa-github text-lg"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript для функциональности -->
+    <script>
+        /**
+         * Оптимизированный скрипт управления интерфейсом сайта GregoryBale Antidote
+         * 
+         * Включает в себя:
+         * 1. Генерацию плавающего кода в фоне
+         * 2. Переключение темного режима
+         * 3. Управление мобильным меню
+         * 4. Систему табов для инструкций
+         * 5. Исправления для плавной прокрутки
+         * 
+         * @author GregoryBale
+         * @version 2.0.1
+         */
+         
+        // Массив кодовых сниппетов для анимации фона
+        const CODE_SNIPPETS = [
+            'def restore_antivirus():',
+            'reset_network_configuration()',
+            'enable_task_manager()',
+            'enable_recovery_options()',
+            'enable_windows_services()',
+            'restore_windows_firewall()',
+            'enable_firewall()',
+            'repair_boot_sector()',
+            'clean_dns_cache()',
+            'check_registry_integrity()',
+            'enable_self_protection()',
+            'kill_blocking_scripts()',
+            'restore_file_associations()',
+            'reset_proxy_settings()',
+            'enable_registry_editor()',
+            'reset_group_policies()',
+            'if not is_admin():',
+            'try: registry_key = winreg.OpenKey()',
+            'subprocess.run([cmd], shell=True)',
+            'print("[PASS !]")',
+        ];
+
+        // Состояние UI
+        let state = {
+            darkMode: false,
+            mobileMenuOpen: false,
+            activeTab: 'description'
+        };
+
+        /**
+         * Генерирует и размещает плавающие фрагменты кода в фоне
+         * Оптимизирована для производительности
+         */
+        function generateCodeBlocks() {
+            const codeBackground = document.getElementById('codeBackground');
+            
+            // Очистка перед генерацией
+            codeBackground.innerHTML = '';
+            
+            // Документальный фрагмент для оптимизации DOM-операций
+            const fragment = document.createDocumentFragment();
+            
+            // Генерация случайно расположенных элементов кода
+            CODE_SNIPPETS.forEach((snippet) => {
+                const top = Math.floor(Math.random() * 100);
+                const left = Math.floor(Math.random() * 100);
+                const duration = 20 + Math.floor(Math.random() * 40);
+                const delay = Math.floor(Math.random() * 10);
+                
+                const codeElement = document.createElement('div');
+                codeElement.className = 'floating-code';
+                codeElement.textContent = snippet;
+                codeElement.style.top = `${top}%`;
+                codeElement.style.left = `${left}%`;
+                codeElement.style.animation = `float ${duration}s linear ${delay}s infinite`;
+                
+                fragment.appendChild(codeElement);
+            });
+            
+            // Добавляем все элементы за одну DOM-операцию
+            codeBackground.appendChild(fragment);
+        }
+
+        /**
+         * Переключает темный режим и обновляет соответствующие стили
+         */
+        function toggleDarkMode() {
+            state.darkMode = !state.darkMode;
+            
+            // Обновление основных классов для темы
+            if (state.darkMode) {
+                document.body.classList.remove('light-mode');
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+                document.body.classList.add('light-mode');
+            }
+            
+            // Обновление иконок темы
+            const darkModeIcons = [
+                document.getElementById('darkModeToggle'),
+                document.getElementById('mobileDarkModeToggle')
+            ];
+            
+            darkModeIcons.forEach(icon => {
+                if (icon) {
+                    icon.innerHTML = state.darkMode ? 
+                        '<i class="fas fa-sun"></i>' : 
+                        '<i class="fas fa-moon"></i>';
+                }
+            });
+            
+            // Сохраняем предпочтение темы
+            saveThemePreference();
+        }
+
+        /**
+         * Переключает видимость мобильного меню
+         */
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            state.mobileMenuOpen = !state.mobileMenuOpen;
+            
+            if (state.mobileMenuOpen) {
+                mobileMenu.classList.remove('hidden');
+            } else {
+                mobileMenu.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Переключает активный таб в секции инструкций
+         * @param {string} tabId - Идентификатор таба
+         */
+        function switchTab(tabId) {
+            if (state.activeTab === tabId) return;
+            
+            state.activeTab = tabId;
+            
+            // Обновление контента табов
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Отображаем активный таб
+            const activeTabContent = document.getElementById(`tab-${tabId}`);
+            if (activeTabContent) {
+                activeTabContent.classList.remove('hidden');
+            }
+            
+            // Обновление стилей кнопок табов
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                const buttonTabId = button.getAttribute('data-tab');
+                
+                // Сброс стилей кнопки
+                button.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+                button.classList.add('text-secondary');
+                
+                // Применение стилей к активной кнопке
+                if (buttonTabId === tabId) {
+                    button.classList.remove('text-secondary');
+                    button.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+                }
+            });
+        }
+
+        /**
+         * Плавная прокрутка к якорю по клику на навигационную ссылку
+         * @param {Event} event - Событие клика
+         */
+        function smoothScrollToAnchor(event) {
+            event.preventDefault();
+            
+            // Получаем целевой элемент из href
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            
+            if (targetElement) {
+                // Закрываем мобильное меню, если оно открыто
+                if (state.mobileMenuOpen) {
+                    toggleMobileMenu();
+                }
+                
+                // Вычисляем позицию для прокрутки (с учетом высоты хедера)
+                const headerOffset = 80; // Примерная высота хедера
+                const elementPosition = targetElement.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                
+                // Плавная прокрутка к элементу
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        /**
+         * Обработчик событий клика на документе
+         * Используется для делегирования событий
+         * @param {Event} event - Событие клика
+         */
+        function handleDocumentClick(event) {
+            // Закрываем мобильное меню при клике вне его
+            if (state.mobileMenuOpen && 
+                !event.target.closest('#mobileMenu') && 
+                !event.target.closest('#mobileMenuToggle')) {
+                toggleMobileMenu();
+            }
+        }
+
+        /**
+         * Пересоздает фоновую анимацию кода при изменении темы
+         */
+        function refreshCodeBackground() {
+            // Регенерация кода с учетом новой темы
+            setTimeout(generateCodeBlocks, 300);
+        }
+
+        /**
+         * Выделяет активные пункты меню при прокрутке страницы
+         */
+        function highlightActiveNavItems() {
+            // Получаем все секции
+            const sections = document.querySelectorAll('section[id]');
+            
+            // Высота хедера для компенсации при определении активной секции
+            const headerHeight = 80;
+            
+            // Находим текущую активную секцию
+            let currentActiveSection = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - headerHeight;
+                const sectionHeight = section.offsetHeight;
+                
+                if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
+                    currentActiveSection = section.getAttribute('id');
+                }
+            });
+            
+            // Обновляем стили для навигационных ссылок
+            if (currentActiveSection) {
+                const navLinks = document.querySelectorAll('.header-link');
+                navLinks.forEach(link => {
+                    // Сбрасываем активные стили
+                    link.classList.remove('active');
+                    
+                    // Добавляем активный стиль для соответствующей ссылки
+                    const href = link.getAttribute('href');
+                    if (href && href === `#${currentActiveSection}`) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        }
+
+        /**
+         * Сохраняет текущее состояние темы в localStorage
+         */
+        function saveThemePreference() {
+            localStorage.setItem('darkMode', state.darkMode);
+        }
+
+        /**
+         * Инициализирует слайдер отзывов
+         */
+        function initTestimonialSlider() {
+            const testimonials = [
+                {
+                    name: "Михаил К.",
+                    text: '"Это спасло меня, когда программа-вымогатель заблокировала мой компьютер. Диспетчер задач, Редактор реестра - все было отключено. Этот скрипт исправил всё за считанные минуты!"',
+                    role: "Пользователь"
+                },
+                {
+                    name: "Сара Т.",
+                    text: '"Как IT-специалист, я всегда держу этот инструмент под рукой. Он сэкономил бесчисленные часы ручного редактирования реестра и восстановления системы."',
+                    role: "IT-специалист"
+                },
+                {
+                    name: "Давид Р.",
+                    text: '"Когда ничего другого не работало, эта утилита восстановила мой доступ к инструментам безопасности Windows. Теперь я наконец смог удалить вредоносное ПО!"',
+                    role: "Пользователь"
+                }
+            ];
+
+            let currentTestimonialIndex = 0;
+            const testimonialContainer = document.createElement('div');
+            testimonialContainer.id = 'testimonial-slider';
+            testimonialContainer.className = 'mt-6 relative';
+
+            const testimonialContent = document.createElement('div');
+            testimonialContent.className = 'bg-blue-50 dark:bg-blue-900 dark:bg-opacity-20 rounded-lg p-6 text-center transition-all duration-500';
+
+            const testimonialText = document.createElement('p');
+            testimonialText.className = 'text-secondary italic mb-4';
+
+            const testimonialAuthor = document.createElement('p');
+            testimonialAuthor.className = 'text-dark font-medium';
+
+            const navigationContainer = document.createElement('div');
+            navigationContainer.className = 'flex justify-center space-x-2 mt-4';
+
+            const prevButton = document.createElement('button');
+            prevButton.innerHTML = '<i class="fas fa-chevron-left text-blue-600"></i>';
+            prevButton.className = 'p-2 rounded-full hover:bg-blue-100 transition-colors';
+
+            const nextButton = document.createElement('button');
+            nextButton.innerHTML = '<i class="fas fa-chevron-right text-blue-600"></i>';
+            nextButton.className = 'p-2 rounded-full hover:bg-blue-100 transition-colors';
+
+            function updateTestimonial(index) {
+                const testimonial = testimonials[index];
+                testimonialText.textContent = testimonial.text;
+                testimonialAuthor.textContent = `${testimonial.name}, ${testimonial.role}`;
+            }
+
+            prevButton.addEventListener('click', () => {
+                currentTestimonialIndex = (currentTestimonialIndex - 1 + testimonials.length) % testimonials.length;
+                updateTestimonial(currentTestimonialIndex);
+            });
+
+            nextButton.addEventListener('click', () => {
+                currentTestimonialIndex = (currentTestimonialIndex + 1) % testimonials.length;
+                updateTestimonial(currentTestimonialIndex);
+            });
+
+            testimonialContent.appendChild(testimonialText);
+            testimonialContent.appendChild(testimonialAuthor);
+            navigationContainer.appendChild(prevButton);
+            navigationContainer.appendChild(nextButton);
+
+            testimonialContainer.appendChild(testimonialContent);
+            testimonialContainer.appendChild(navigationContainer);
+
+            // Находим контейнер с отзывами и добавляем наш слайдер
+            const benefitsSection = document.querySelector('#benefits .grid');
+            if (benefitsSection) {
+                const testimonialCol = benefitsSection.querySelector('.card-bg');
+                if (testimonialCol) {
+                    testimonialCol.appendChild(testimonialContainer);
+                }
+            }
+
+            // Инициализируем первый отзыв
+            updateTestimonial(0);
+        }
+
+        /**
+         * Инициализация всех интерактивных элементов на странице
+         */
+        function initializeUiComponents() {
+            // Генерация фонового кода
+            generateCodeBlocks();
+            
+            // Настройка переключателей темного режима
+            const darkModeToggles = [
+                document.getElementById('darkModeToggle'),
+                document.getElementById('mobileDarkModeToggle')
+            ];
+            
+            darkModeToggles.forEach(toggle => {
+                if (toggle) {
+                    toggle.addEventListener('click', function() {
+                        toggleDarkMode();
+                        refreshCodeBackground();
+                    });
+                }
+            });
+            
+            // Настройка переключателя мобильного меню
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+            }
+            
+            // Настройка навигационных ссылок для плавной прокрутки
+            const navLinks = document.querySelectorAll('a[href^="#"]');
+            navLinks.forEach(link => {
+                // Не добавляем прокрутку для ссылок на табы
+                if (!link.classList.contains('tab-button')) {
+                    link.addEventListener('click', smoothScrollToAnchor);
+                }
+            });
+            
+            // Настройка переключения табов
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    switchTab(this.getAttribute('data-tab'));
+                });
+            });
+            
+            // Настройка обработчика клика для закрытия мобильного меню
+            document.addEventListener('click', handleDocumentClick);
+            
+            // Исправление для мобильных навигационных ссылок
+            const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+            mobileNavLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (state.mobileMenuOpen) {
+                        toggleMobileMenu();
+                    }
+                });
+            });
+            
+            // Оптимизация для мобильных устройств
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 768 && state.mobileMenuOpen) {
+                    toggleMobileMenu();
+                }
+            });
+            
+            // Восстановление сохраненной темы из localStorage
+            if (localStorage.getItem('darkMode') === 'true') {
+                toggleDarkMode();
+            }
+            
+            // Обработка событий прокрутки для выделения активных пунктов меню
+            window.addEventListener('scroll', highlightActiveNavItems);
+            
+            // Инициализация слайдера отзывов
+            initTestimonialSlider();
+        }
+
+        // Запуск инициализации после полной загрузки DOM
+        document.addEventListener('DOMContentLoaded', initializeUiComponents);
+
+        // Перезапуск анимации кода при возвращении на вкладку
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                generateCodeBlocks();
+            }
+        });
+    </script>
+</body>
+</html>
